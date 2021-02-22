@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Kill Block
+  - Pick Up
+  - Finish Line
+  - Platform
+  - Fall Detect
   layers:
   - Default
   - TransparentFX
