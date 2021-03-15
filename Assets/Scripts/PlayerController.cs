@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public float speed = 15.0f;
     public float sideSpeed = 15.0f;
     private bool isGrounded;
+    private bool playerAlive = true;
     private float horizontalInput;
     private Vector3 jump = new Vector3(0, 1, 0);
     private int lives = 3;
@@ -16,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public AudioSource playSound;
     public AudioSource playSound2;
     public GameManager gameManager;
+    public Button playAgain;
     public Transform checkpoint;
     public Text scoreText;
     public Text livesText;
@@ -29,31 +31,40 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.Translate(Vector3.forward * Time.deltaTime * speed);
-        }
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) 
-        {
-            transform.Translate(Vector3.up + jump);
-            isGrounded = false;
-        }
-        transform.Translate(Vector3.right * Time.deltaTime * sideSpeed * horizontalInput);
+        PlayerMovement();
         score = transform.position.z;
         scoreText.text = (score + scoreAdd).ToString("0");
 
-        if(transform.position.y < -3.0f)
+        if(transform.position.y < -3.0f && lives > 0)
         {
             transform.position = checkpoint.position;
             transform.rotation = checkpoint.rotation;
-            if(lives == 0)
-            {
-                gameManager.EndGame();
-                playSound2.Play();
-            }
+        }
+        else if (transform.position.y < -3.0f && lives == 0)
+        {
+            //playSound2.Play();
+            ButtonActivator();
         }
     }
+
+    void PlayerMovement()
+    {
+        if (playerAlive == true)
+        {
+            horizontalInput = Input.GetAxis("Horizontal");
+            if (Input.GetKey(KeyCode.W))
+            {
+                transform.Translate(Vector3.forward * Time.deltaTime * speed);
+            }
+            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            {
+                transform.Translate(Vector3.up + jump);
+                isGrounded = false;
+            }
+            transform.Translate(Vector3.right * Time.deltaTime * sideSpeed * horizontalInput);
+        }
+    }
+
     void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Platform"))
@@ -78,36 +89,55 @@ public class PlayerController : MonoBehaviour
             other.gameObject.SetActive(false);
             Debug.Log("Score: " + score);
         }
-        if(other.gameObject.CompareTag("Kill Block"))
+        else if(other.gameObject.CompareTag("Kill Block"))
         {
             Debug.Log("Lives: " + lives);
             lives = lives - 1;
 
             livesText.text = "Lives: " + lives;
-
-            transform.position = checkpoint.position;
-            transform.rotation = checkpoint.rotation;
-
-            if (lives == 0)
+            if (lives > 0)
             {
-                gameManager.EndGame();
+                transform.position = checkpoint.position;
+                transform.rotation = checkpoint.rotation;
+            }
+            else if (lives == 0)
+            {
                 playSound2.Play();
+                ButtonActivator();
             }
         }
-        if(other.gameObject.CompareTag("Finish Line"))
+        else if(other.gameObject.CompareTag("Finish Line"))
         {
             Debug.Log("You Win!");
             winText.gameObject.SetActive(true);
             livesText.gameObject.SetActive(false);
             scoreText.gameObject.SetActive(false);
+            ButtonActivator();
 
         }
-        if(other.gameObject.CompareTag("Fall Detect"))
+        else if(other.gameObject.CompareTag("Fall Detect"))
         {
             lives = lives - 1;
             Debug.Log("Lives: " + lives);
             livesText.text = "Lives: " + lives;
+            if (lives == 0)
+            {
+                playSound2.Play();
+            }
 
         }
     }
+    void TaskOnClick()
+    {
+        gameManager.EndGame();
+    }
+
+    void ButtonActivator()
+    {
+        playerAlive = false;
+        playAgain.gameObject.SetActive(true);
+        playAgain.onClick.AddListener(TaskOnClick);
+    }
+
+    
 }
