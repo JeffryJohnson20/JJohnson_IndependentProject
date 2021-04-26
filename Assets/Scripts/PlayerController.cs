@@ -44,11 +44,6 @@ public class PlayerController : MonoBehaviour
             transform.position = checkpoint.position;
             transform.rotation = checkpoint.rotation;
         }
-        else if (transform.position.y < -3.0f && lives == 0)
-        {
-            //playSound2.Play();
-            ButtonActivator();
-        }
     }
 
     void PlayerMovement()
@@ -138,6 +133,7 @@ public class PlayerController : MonoBehaviour
                 playSound3.gameObject.SetActive(false);
                 playSound2.Play();
                 bloodSplat.Play();
+                ButtonActivator();
                 Destroy(player);
             }
 
