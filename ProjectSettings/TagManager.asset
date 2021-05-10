@@ -9,6 +9,7 @@ TagManager:
   - Finish Line
   - Platform
   - Fall Detect
+  - Power Up
   layers:
   - Default
   - TransparentFX

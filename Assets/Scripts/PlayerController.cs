@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,8 +9,10 @@ public class PlayerController : MonoBehaviour
     public GameObject player;
     public float speed = 15.0f;
     public float sideSpeed = 15.0f;
+    private int timer = 0;
     private bool isGrounded;
     public bool playerAlive = true;
+    private bool hasPowerUp = false;
     private float horizontalInput;
     private Vector3 jump = new Vector3(0, 1, 0);
     private int lives = 3;
@@ -24,12 +27,16 @@ public class PlayerController : MonoBehaviour
     public Text scoreText;
     public Text livesText;
     public Text winText;
+    public Text timeText;
     private Animator animPlayer;
     public ParticleSystem bloodSplat;
+    public GameObject speedPart;
+    private bool playerWin = false;
     // Start is called before the first frame update
     void Start()
     {
         animPlayer = GetComponent<Animator>();
+        StartCoroutine(TimeCounter());
     }
 
     // Update is called once per frame
@@ -38,12 +45,21 @@ public class PlayerController : MonoBehaviour
         PlayerMovement();
         score = transform.position.z;
         scoreText.text = (score + scoreAdd).ToString("0");
+        if (playerWin == false)
+        {
+            timeText.text = "Time Bonus: " + ((20 - timer) * 10).ToString("0");
+        }
+        
 
-        if(transform.position.y < -3.0f && lives > 0)
+
+        if (transform.position.y < -3.0f && lives > 0)
         {
             transform.position = checkpoint.position;
             transform.rotation = checkpoint.rotation;
         }
+
+        Debug.Log(timer);
+        
     }
 
     void PlayerMovement()
@@ -118,9 +134,11 @@ public class PlayerController : MonoBehaviour
             Debug.Log("You Win!");
             winText.gameObject.SetActive(true);
             livesText.gameObject.SetActive(false);
-            scoreText.gameObject.SetActive(false);
+            //scoreText.gameObject.SetActive(false);
             ButtonActivator();
             animPlayer.SetFloat("Speed_f", 0.0f);
+            scoreAdd += (20 - timer) * 10;
+            playerWin = true;
 
         }
         else if(other.gameObject.CompareTag("Fall Detect"))
@@ -138,6 +156,16 @@ public class PlayerController : MonoBehaviour
             }
 
         }
+
+        if (other.gameObject.CompareTag("Power Up"))
+        {
+            hasPowerUp = true;
+            Destroy(other.gameObject);
+            StartCoroutine(PowerUpCountdown());
+            speedPart.SetActive(true);
+            speed = 20.0f;
+            sideSpeed = 20.0f;
+        }
     }
     void TaskOnClick()
     {
@@ -149,6 +177,24 @@ public class PlayerController : MonoBehaviour
         playerAlive = false;
         playAgain.gameObject.SetActive(true);
         playAgain.onClick.AddListener(TaskOnClick);
+    }
+
+    IEnumerator PowerUpCountdown()
+    {
+        //speed = 20.0f;
+        yield return new WaitForSeconds(5);
+        hasPowerUp = false;
+        speedPart.SetActive(false);
+        speed = 15.0f;
+        sideSpeed = 15.0f;
+    }
+
+    IEnumerator TimeCounter()
+    {
+        for(timer = 0; timer < 20; timer++)
+        {
+            yield return new WaitForSeconds(1);
+        }
     }
 
     
