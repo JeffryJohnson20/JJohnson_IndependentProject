@@ -10,6 +10,7 @@ TagManager:
   - Platform
   - Fall Detect
   - Power Up
+  - JumpBlock
   layers:
   - Default
   - TransparentFX

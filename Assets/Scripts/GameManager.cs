@@ -12,12 +12,22 @@ public class GameManager : MonoBehaviour
         if (gameEnded == false)
         {
             gameEnded = true;
-            Restart();
+            Application.Quit();
+            Debug.Log("Application has quit");
         }
     }
 
-    void Restart ()
+    public void Restart ()
     {
-        SceneManager.LoadScene("JJohnson_IndependentProject");
+        if (gameEnded == false)
+        {
+            gameEnded = true;
+            SceneManager.LoadScene("JJohnson_IndependentProject");
+        }
+    }
+
+    public void ExitToMenu()
+    {
+        SceneManager.LoadScene("Menu Screen");
     }
 }

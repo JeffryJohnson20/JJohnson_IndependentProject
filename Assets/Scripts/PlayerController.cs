@@ -23,6 +23,8 @@ public class PlayerController : MonoBehaviour
     public AudioSource playSound3;
     public GameManager gameManager;
     public Button playAgain;
+    public Button exitGame;
+    public Button exitMenu;
     public Transform checkpoint;
     public Text scoreText;
     public Text livesText;
@@ -44,10 +46,14 @@ public class PlayerController : MonoBehaviour
     {
         PlayerMovement();
         score = transform.position.z;
+        if (score < 0)
+        {
+            score = 0;
+        }
         scoreText.text = (score + scoreAdd).ToString("0");
         if (playerWin == false)
         {
-            timeText.text = "Time Bonus: " + ((20 - timer) * 10).ToString("0");
+            timeText.text = "Time Bonus: " + ((20 - timer) * 20).ToString("0");
         }
         
 
@@ -137,7 +143,7 @@ public class PlayerController : MonoBehaviour
             //scoreText.gameObject.SetActive(false);
             ButtonActivator();
             animPlayer.SetFloat("Speed_f", 0.0f);
-            scoreAdd += (20 - timer) * 10;
+            scoreAdd += (20 - timer) * 20;
             playerWin = true;
 
         }
@@ -167,16 +173,30 @@ public class PlayerController : MonoBehaviour
             sideSpeed = 20.0f;
         }
     }
-    void TaskOnClick()
+    void RestartOnClick()
+    {
+        gameManager.Restart();
+    }
+
+    void QuitOnClick()
     {
         gameManager.EndGame();
+    }
+
+    void ExitToMenuClick()
+    {
+        gameManager.ExitToMenu();
     }
 
     void ButtonActivator()
     {
         playerAlive = false;
         playAgain.gameObject.SetActive(true);
-        playAgain.onClick.AddListener(TaskOnClick);
+        playAgain.onClick.AddListener(RestartOnClick);
+        exitGame.gameObject.SetActive(true);
+        exitGame.onClick.AddListener(QuitOnClick);
+        exitMenu.gameObject.SetActive(true);
+
     }
 
     IEnumerator PowerUpCountdown()
